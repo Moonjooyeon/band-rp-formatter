@@ -3,10 +3,20 @@ import SessionCard from './SessionCard.jsx';
 export default function LibraryView({ sessions, onOpenSession, onAddNew, onEdit, onDelete }) {
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12 relative">
+      {/* 브랜드 */}
+      <div className="text-center mb-8 sm:mb-10">
+        <div className="text-[10px] tracking-[0.3em] uppercase text-white/60 font-semibold mb-1">
+          Communal Backup
+        </div>
+        <h1 className="font-bold text-white text-2xl sm:text-3xl tracking-tight">
+          커뮤 백업
+        </h1>
+      </div>
+
       {/* 헤더 */}
-      <div className="flex items-end justify-between mb-8 sm:mb-10 gap-4 flex-wrap">
+      <div className="flex items-end justify-between mb-6 sm:mb-8 gap-4 flex-wrap">
         <div>
-          <h2 className="font-serif text-3xl sm:text-4xl font-bold text-white/95 tracking-tight">
+          <h2 className="font-serif text-2xl sm:text-3xl font-bold text-white/95 tracking-tight">
             나의 기록
           </h2>
           <p className="text-sm text-white/70 mt-1">

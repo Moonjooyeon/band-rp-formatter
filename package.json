@@ -1,6 +1,6 @@
 {
-  "name": "band-rp-formatter",
-  "version": "0.1.0",
+  "name": "communal-backup",
+  "version": "0.5.0",
   "type": "module",
   "private": true,
   "scripts": {
