@@ -128,13 +128,13 @@ export default function AddSession({ onCancel, onSave, initialData = null }) {
 
         {/* 메타 폼 */}
         <div className="space-y-3">
-          <Field label="장르 / 태그" help="예: CoC, 로판, 적과흑">
+          <Field label="장르 / 태그" help="예: CoC, 로판, 일상">
             <input
               type="text"
               value={meta.tag}
               onChange={e => setMeta(m => ({ ...m, tag: e.target.value }))}
               className="w-full px-3 py-2 border border-lavender-100 rounded-md bg-white"
-              placeholder="CoC"
+              placeholder="카테고리"
             />
           </Field>
           <Field label="제목 *">
@@ -143,7 +143,7 @@ export default function AddSession({ onCancel, onSave, initialData = null }) {
               value={meta.title}
               onChange={e => setMeta(m => ({ ...m, title: e.target.value }))}
               className="w-full px-3 py-2 border border-lavender-100 rounded-md bg-white"
-              placeholder="생계무책 生計無策"
+              placeholder="이 세션의 제목을 입력하세요"
             />
           </Field>
           <Field label="설명">
@@ -168,7 +168,7 @@ export default function AddSession({ onCancel, onSave, initialData = null }) {
               value={meta.pcs}
               onChange={e => setMeta(m => ({ ...m, pcs: e.target.value }))}
               className="w-full px-3 py-2 border border-lavender-100 rounded-md bg-white"
-              placeholder="스텔라 리어, 아서 청"
+              placeholder="등장 캐릭터들"
             />
           </Field>
           <div className="grid grid-cols-2 gap-2">
