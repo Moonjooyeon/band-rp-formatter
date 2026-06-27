@@ -1,15 +1,26 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { parseBackup } from '../lib/parser.js';
 
-export default function AddSession({ onCancel, onSave }) {
-  const [stage, setStage] = useState('upload'); // 'upload' | 'form'
-  const [parsed, setParsed] = useState(null);
+export default function AddSession({ onCancel, onSave, initialData = null }) {
+  const [stage, setStage] = useState(initialData ? 'form' : 'upload');
+  const [parsed, setParsed] = useState(initialData);
   const [error, setError] = useState('');
   const [meta, setMeta] = useState({
     title: '', tag: '', description: '', gm: '', pcs: '', date: '', dateEnd: '', cover: ''
   });
   const fileRef = useRef(null);
   const coverRef = useRef(null);
+
+  // initialData가 있으면 자동 채우기
+  useEffect(() => {
+    if (initialData) {
+      setMeta(m => ({
+        ...m,
+        date: m.date || extractDate(initialData),
+        pcs: m.pcs || extractPcs(initialData),
+      }));
+    }
+  }, [initialData]);
 
   async function handleFile(file) {
     setError('');
