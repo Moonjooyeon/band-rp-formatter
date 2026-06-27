@@ -1,4 +1,5 @@
 // 카카오톡 스타일 채팅 미리보기
+import { cleanText } from '../lib/text.js';
 
 export default function DmPreview({ data }) {
   return (
@@ -22,15 +23,15 @@ function MsgRow({ msg, prev }) {
   }
 
   const isMe = msg.type === 'me';
-  // 같은 사람 연속 발화는 이름 생략 (카톡 스타일)
   const samePrev = prev && prev.type === msg.type && prev.name === msg.name;
+  const body = cleanText(msg.body);
 
   if (isMe) {
     return (
       <div className="flex justify-end items-end gap-1">
         <span className="text-[10px] text-whisper mb-0.5 shrink-0">{msg.time}</span>
         <div className="max-w-[70%] bg-kakao-me text-ink rounded-2xl rounded-tr-md px-3 py-2 text-sm leading-relaxed whitespace-pre-wrap break-words">
-          {msg.body}
+          {body}
         </div>
       </div>
     );
@@ -40,7 +41,7 @@ function MsgRow({ msg, prev }) {
     <div className="flex items-start gap-2">
       <div className="w-8 h-8 shrink-0">
         {!samePrev && (
-          <div className="w-8 h-8 rounded-full bg-mokpan flex items-center justify-center text-xs text-whisper">
+          <div className="w-8 h-8 rounded-full bg-lavender-100 flex items-center justify-center text-xs text-whisper">
             {msg.name?.[0] || '?'}
           </div>
         )}
@@ -51,7 +52,7 @@ function MsgRow({ msg, prev }) {
         )}
         <div className="flex items-end gap-1">
           <div className="max-w-[70%] bg-kakao-other text-ink rounded-2xl rounded-tl-md px-3 py-2 text-sm leading-relaxed whitespace-pre-wrap break-words">
-            {msg.body}
+            {body}
           </div>
           <span className="text-[10px] text-whisper mb-0.5 shrink-0">{msg.time}</span>
         </div>
