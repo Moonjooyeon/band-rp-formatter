@@ -62,7 +62,7 @@ export function buildCharacterIndex(sessions) {
   return Array.from(map.values()).sort((a, b) => b.sessionCount - a.sessionCount || b.lastSeen - a.lastSeen);
 }
 
-// 한 세션의 등장 캐릭터/작성자 모음 (메타 PC + 실제 데이터)
+// 한 세션의 등장 캐릭터/작성자 모음 (메타 PC + 실제 데이터, _filteredOut 제외)
 export function collectSessionParticipants(session) {
   const set = new Set();
   if (session.pcs) session.pcs.forEach(p => p && set.add(p));
@@ -74,7 +74,8 @@ export function collectSessionParticipants(session) {
     } else if (session.data.kind === 'post') {
       if (session.data.meta.author) set.add(session.data.meta.author);
       const walk = cs => cs.forEach(c => {
-        if (c.name) set.add(c.name);
+        // placeholder는 이름 제외, 답글은 재귀
+        if (!c._filteredOut && c.name) set.add(c.name);
         if (c.replies) walk(c.replies);
       });
       walk(session.data.comments);

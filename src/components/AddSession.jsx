@@ -260,16 +260,25 @@ function extractDate(parsed) {
 }
 
 function extractPcs(parsed) {
-  // 댓글/메시지 작성자 모아서 ", "로
+  // 필터가 적용된 경우: 필터 선택자 + 글 작성자만
+  if (parsed.kind === 'post' && parsed.meta?.filterApplied?.length > 0) {
+    const set = new Set(parsed.meta.filterApplied);
+    if (parsed.meta.author) set.add(parsed.meta.author);
+    return Array.from(set).join(', ');
+  }
+
+  // 필터 없음: 모든 작성자 (_filteredOut placeholder 제외)
   const set = new Set();
   if (parsed.kind === 'dm') {
     parsed.messages.forEach(m => {
       if (m.name && (m.type === 'me' || m.type === 'friend')) set.add(m.name);
     });
   } else if (parsed.kind === 'post') {
+    if (parsed.meta?.author) set.add(parsed.meta.author);
     const walk = (cs) => {
       cs.forEach(c => {
-        if (c.name) set.add(c.name);
+        // placeholder는 이름 제외, 답글은 재귀
+        if (!c._filteredOut && c.name) set.add(c.name);
         if (c.replies) walk(c.replies);
       });
     };
