@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import LibraryView from './components/LibraryView.jsx';
 import AddSession from './components/AddSession.jsx';
 import DetailView from './components/DetailView.jsx';
+import CharacterDetailView from './components/CharacterDetailView.jsx';
 import { loadLibrary, addSession, removeSession } from './lib/library.js';
 import { parseBackup } from './lib/parser.js';
 
@@ -9,6 +10,7 @@ export default function App() {
   const [sessions, setSessions] = useState([]);
   const [view, setView] = useState('library');
   const [activeSession, setActiveSession] = useState(null);
+  const [activeCharacter, setActiveCharacter] = useState(null);
   const [incomingData, setIncomingData] = useState(null);
   const [toast, setToast] = useState('');
 
@@ -32,13 +34,10 @@ export default function App() {
     }
     window.addEventListener('message', onMsg);
 
-    // 부모(opener)에게 준비됐다고 알림
     if (window.opener) {
       try {
         window.opener.postMessage({ type: 'BAND_RP_FORMATTER_READY' }, '*');
-      } catch (e) {
-        // cross-origin 에러 무시
-      }
+      } catch (e) {}
     }
 
     return () => window.removeEventListener('message', onMsg);
@@ -67,12 +66,17 @@ export default function App() {
     setSessions(removeSession(session.id));
   }
 
-  function handleOpen(session) {
+  function handleOpenSession(session) {
     setActiveSession(session);
     setView('detail');
   }
 
-  // 디테일 뷰는 자체 배경
+  function handleOpenCharacter(character) {
+    setActiveCharacter(character);
+    setView('character-detail');
+  }
+
+  // 디테일 뷰는 자체 흰 배경
   if (view === 'detail' && activeSession) {
     return (
       <>
@@ -89,9 +93,18 @@ export default function App() {
         {view === 'library' && (
           <LibraryView
             sessions={sessions}
-            onOpenSession={handleOpen}
+            onOpenSession={handleOpenSession}
+            onOpenCharacter={handleOpenCharacter}
             onAddNew={() => setView('add')}
             onDelete={handleDelete}
+          />
+        )}
+        {view === 'character-detail' && activeCharacter && (
+          <CharacterDetailView
+            character={activeCharacter}
+            onBack={() => setView('library')}
+            onOpenSession={handleOpenSession}
+            onDeleteSession={handleDelete}
           />
         )}
         {view === 'add' && (

@@ -44,6 +44,45 @@ export function removeSession(id) {
   return next;
 }
 
+// 모든 세션에서 등장하는 캐릭터/작성자 추출 → 빈도순 정렬
+export function buildCharacterIndex(sessions) {
+  const map = new Map();
+  for (const s of sessions) {
+    const names = collectSessionParticipants(s);
+    for (const name of names) {
+      if (!map.has(name)) map.set(name, { name, sessions: [], sessionCount: 0, lastSeen: 0 });
+      const entry = map.get(name);
+      if (!entry.sessions.find(x => x.id === s.id)) {
+        entry.sessions.push(s);
+        entry.sessionCount++;
+        if ((s.createdAt || 0) > entry.lastSeen) entry.lastSeen = s.createdAt || 0;
+      }
+    }
+  }
+  return Array.from(map.values()).sort((a, b) => b.sessionCount - a.sessionCount || b.lastSeen - a.lastSeen);
+}
+
+// 한 세션의 등장 캐릭터/작성자 모음 (메타 PC + 실제 데이터)
+export function collectSessionParticipants(session) {
+  const set = new Set();
+  if (session.pcs) session.pcs.forEach(p => p && set.add(p));
+  if (session.data) {
+    if (session.data.kind === 'dm') {
+      session.data.messages.forEach(m => {
+        if (m.name && (m.type === 'me' || m.type === 'friend')) set.add(m.name);
+      });
+    } else if (session.data.kind === 'post') {
+      if (session.data.meta.author) set.add(session.data.meta.author);
+      const walk = cs => cs.forEach(c => {
+        if (c.name) set.add(c.name);
+        if (c.replies) walk(c.replies);
+      });
+      walk(session.data.comments);
+    }
+  }
+  return set;
+}
+
 function cryptoId() {
   if (window.crypto?.randomUUID) return window.crypto.randomUUID();
   return 'id-' + Math.random().toString(36).slice(2) + '-' + Date.now().toString(36);
