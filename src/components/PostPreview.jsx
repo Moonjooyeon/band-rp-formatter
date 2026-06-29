@@ -3,18 +3,20 @@ import { colorForAuthor } from '../lib/colors.js';
 import { splitParagraphs, cleanText } from '../lib/text.js';
 
 // 댓글 트리를 시간순 흐름으로 평탄화 (답글은 replyingTo로 표시)
+// _filteredOut placeholder는 본인은 안 보이고, 답글들의 replyingTo는 그대로 유지
 function flattenComments(comments) {
   const flat = [];
   function walk(arr, parentName = null) {
     for (const c of arr) {
-      flat.push({
-        name: c.name,
-        nameExtra: c.nameExtra,
-        body: c.body,
-        time: c.time,
-        replyingTo: parentName,
-        _filteredOut: c._filteredOut,
-      });
+      if (!c._filteredOut) {
+        flat.push({
+          name: c.name,
+          nameExtra: c.nameExtra,
+          body: c.body,
+          time: c.time,
+          replyingTo: parentName,
+        });
+      }
       if (c.replies?.length > 0) walk(c.replies, c.name);
     }
   }
@@ -87,16 +89,6 @@ export default function PostPreview({ data, myCharacter }) {
 }
 
 function KakaoBubble({ comment, isMe, samePrev }) {
-  if (comment._filteredOut) {
-    return (
-      <div className="text-center my-2">
-        <span className="text-[10px] text-white/70 bg-black/15 px-2.5 py-0.5 rounded-full">
-          — 필터로 가려진 댓글 —
-        </span>
-      </div>
-    );
-  }
-
   const color = colorForAuthor(comment.name);
   const body = cleanText(comment.body);
 

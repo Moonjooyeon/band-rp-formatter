@@ -18,6 +18,7 @@ export default function AddSession({ onCancel, onSave, initialData = null }) {
         ...m,
         date: m.date || extractDate(initialData),
         pcs: m.pcs || extractPcs(initialData),
+        gm: m.gm || extractGm(initialData),
       }));
     }
   }, [initialData]);
@@ -34,6 +35,7 @@ export default function AddSession({ onCancel, onSave, initialData = null }) {
         ...m,
         date: m.date || extractDate(p),
         pcs: m.pcs || extractPcs(p),
+        gm: m.gm || extractGm(p),
       }));
       setStage('form');
     } catch (e) {
@@ -255,6 +257,13 @@ function extractDate(parsed) {
   }
   if (parsed.meta.extractedAt) {
     return parsed.meta.extractedAt.slice(0, 10);
+  }
+  return '';
+}
+
+function extractGm(parsed) {
+  if (parsed.kind === 'post' && parsed.meta?.author) {
+    return parsed.meta.author;
   }
   return '';
 }
