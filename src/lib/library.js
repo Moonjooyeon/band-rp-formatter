@@ -62,15 +62,15 @@ export function buildCharacterIndex(sessions) {
   return Array.from(map.values()).sort((a, b) => b.sessionCount - a.sessionCount || b.lastSeen - a.lastSeen);
 }
 
-// 세션의 메인 캐릭터 = 글 작성자(post) 또는 대화 상대(DM)
+// 세션의 메인 캐릭터 = 글 작성자(post) 또는 나(DM)
 function getSessionMainCharacter(session) {
   if (!session.data) return '';
   if (session.data.kind === 'post' && session.data.meta?.author) {
     return session.data.meta.author;
   }
   if (session.data.kind === 'dm') {
-    const friend = session.data.messages?.find(m => m.type === 'friend');
-    if (friend?.name) return friend.name;
+    const me = session.data.messages?.find(m => m.type === 'me');
+    if (me?.name) return me.name;
   }
   return '';
 }
