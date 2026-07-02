@@ -265,6 +265,11 @@ function extractGm(parsed) {
   if (parsed.kind === 'post' && parsed.meta?.author) {
     return parsed.meta.author;
   }
+  if (parsed.kind === 'dm') {
+    // DM에서는 "나(me)"의 이름
+    const meMsg = parsed.messages?.find(m => m.type === 'me');
+    if (meMsg?.name) return meMsg.name;
+  }
   return '';
 }
 
