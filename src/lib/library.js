@@ -44,22 +44,35 @@ export function removeSession(id) {
   return next;
 }
 
-// 모든 세션에서 등장하는 캐릭터/작성자 추출 → 빈도순 정렬
+// 모든 세션에서 자캐 추출 → 빈도순 정렬
+// 자캐 정의: post의 경우 글 작성자, DM의 경우 대화 상대(friend)
 export function buildCharacterIndex(sessions) {
   const map = new Map();
   for (const s of sessions) {
-    const names = collectSessionParticipants(s);
-    for (const name of names) {
-      if (!map.has(name)) map.set(name, { name, sessions: [], sessionCount: 0, lastSeen: 0 });
-      const entry = map.get(name);
-      if (!entry.sessions.find(x => x.id === s.id)) {
-        entry.sessions.push(s);
-        entry.sessionCount++;
-        if ((s.createdAt || 0) > entry.lastSeen) entry.lastSeen = s.createdAt || 0;
-      }
+    const name = getSessionMainCharacter(s);
+    if (!name) continue;
+    if (!map.has(name)) map.set(name, { name, sessions: [], sessionCount: 0, lastSeen: 0 });
+    const entry = map.get(name);
+    if (!entry.sessions.find(x => x.id === s.id)) {
+      entry.sessions.push(s);
+      entry.sessionCount++;
+      if ((s.createdAt || 0) > entry.lastSeen) entry.lastSeen = s.createdAt || 0;
     }
   }
   return Array.from(map.values()).sort((a, b) => b.sessionCount - a.sessionCount || b.lastSeen - a.lastSeen);
+}
+
+// 세션의 메인 캐릭터 = 글 작성자(post) 또는 대화 상대(DM)
+function getSessionMainCharacter(session) {
+  if (!session.data) return '';
+  if (session.data.kind === 'post' && session.data.meta?.author) {
+    return session.data.meta.author;
+  }
+  if (session.data.kind === 'dm') {
+    const friend = session.data.messages?.find(m => m.type === 'friend');
+    if (friend?.name) return friend.name;
+  }
+  return '';
 }
 
 // 한 세션의 등장 캐릭터/작성자 모음 (메타 PC + 실제 데이터, _filteredOut 제외)
